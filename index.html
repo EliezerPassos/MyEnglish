@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>inglêsAPP</title>
+<meta name="description" content="Rotina diária para falar inglês: marque as etapas, acompanhe os dias seguidos e suas fases.">
+<meta name="theme-color" content="#0E7C61">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>inglêsAPP</h1>
+    <p class="sub" id="sub">Marque cada etapa ao terminar. Seu progresso fica salvo.</p>
+  </header>
+
+  <div class="banner warn" id="nudge" hidden>Já passou do seu horário. Bora fazer o inglês de hoje?</div>
+
+  <section class="stats" aria-label="Resumo">
+    <div class="stat fire"><b id="streak">0</b><span>dias seguidos</span></div>
+    <div class="stat"><b id="total">0</b><span>dias concluídos</span></div>
+    <div class="stat"><b id="dayn">1</b><span id="dayn-l">dia de 168</span></div>
+  </section>
+
+  <section class="panel" aria-labelledby="day-title">
+    <div class="dayhead">
+      <div><h2 id="day-title">Hoje</h2><div class="note" id="day-date"></div></div>
+      <div class="daynav">
+        <button class="icon" id="prev" aria-label="Dia anterior">‹</button>
+        <button class="icon" id="next" aria-label="Próximo dia">›</button>
+      </div>
+    </div>
+    <div class="focus" id="focus"></div>
+    <div class="mode" role="group" aria-label="Duração do dia">
+      <button id="m-full" aria-pressed="true">Rotina completa · 60 min</button>
+      <button id="m-short" aria-pressed="false">Dia corrido · 30 min</button>
+    </div>
+    <ul class="tasks" id="tasks"></ul>
+    <div class="banner" id="banner" hidden>Dia concluído! Amanhã tem mais.</div>
+  </section>
+
+  <section class="panel phase" aria-labelledby="ph-title">
+    <h2 id="ph-title">Sua fase</h2>
+    <div class="phases" id="phases"></div>
+    <div class="goal" id="goal"></div>
+    <div class="bar" aria-hidden="true"><i id="ph-bar" style="width:0%"></i></div>
+    <div class="note" id="ph-note"></div>
+    <div class="row">
+      <button class="btn" id="ph-next">Bati a meta, ir para a próxima fase</button>
+      <button class="btn ghost" id="ph-back" hidden>Voltar uma fase</button>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="cal-title">
+    <h2 id="cal-title">Seus 6 meses</h2>
+    <div class="heat-wrap"><div class="heat" id="heat" role="img" aria-label="Calendário de dias estudados"></div></div>
+    <div class="legend">
+      <span><i style="background:var(--accent)"></i>Concluído</span>
+      <span><i style="background:var(--sun)"></i>Parcial</span>
+      <span><i style="background:var(--empty)"></i>Não estudou</span>
+    </div>
+    <div class="note">Cada coluna é uma semana, de segunda (em cima) a domingo.</div>
+  </section>
+
+  <section class="panel" aria-labelledby="mi-title">
+    <h2 id="mi-title">Marcos de fala</h2>
+    <ul class="miles" id="miles"></ul>
+  </section>
+
+  <section class="panel" aria-labelledby="rem-title">
+    <h2 id="rem-title">Lembrete diário</h2>
+    <div class="row" style="align-items:center">
+      <label for="rem-time">Horário</label>
+      <input type="time" id="rem-time" value="20:00" class="time">
+      <button class="btn" id="rem-on">Ativar lembrete</button>
+    </div>
+    <p class="note" id="rem-note"></p>
+  </section>
+
+  <section class="panel" aria-labelledby="bk-title">
+    <h2 id="bk-title">Backup</h2>
+    <p class="note">Seu progresso fica salvo neste aparelho. Para trocar de celular, copie o backup e cole no app novo.</p>
+    <textarea id="bk-text" rows="3" class="bk" placeholder="Cole aqui o texto do backup para restaurar"></textarea>
+    <div class="row">
+      <button class="btn" id="bk-export">Copiar backup</button>
+      <button class="btn ghost" id="bk-import">Restaurar backup</button>
+    </div>
+  </section>
+
+  <p class="note" id="save-note">Carregando seu progresso…</p>
+  <p class="note">Plano completo: <a href="https://claude.ai/code/artifact/9ae49c04-e4ad-471a-a2da-8dc040a3d153" target="_blank" rel="noopener">Plano para Falar Inglês (Grátis)</a></p>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
