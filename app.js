@@ -23,7 +23,8 @@ const pad=n=>String(n).padStart(2,'0');
 const key=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
 const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
-const diffDays=(a,b)=>Math.round((parse(key(b))-parse(key(a)))/864e5);
+const toKey=x=>typeof x==='string'?x:key(x);
+const diffDays=(a,b)=>Math.round((parse(toKey(b))-parse(toKey(a)))/864e5);
 const todayKey=()=>key(new Date());
 
 let state={start:todayKey(),phase:1,days:{},short:{},miles:{},reminder:null};
