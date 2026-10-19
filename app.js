@@ -245,8 +245,20 @@ document.getElementById('bk-import').onclick=()=>{
   catch(e){note('Esse texto não é um backup válido do inglêsAPP.')}
 };
 
+const LEVELS=['Iniciando','Aquecendo','Ganhando ritmo','Destravando','Conversando','Fluindo','Mandando bem'];
+function renderLevel(){
+  const total=Object.keys(state.days).filter(k=>status(k)==='c').length;
+  const lv=Math.floor(total/7)+1;
+  document.getElementById('lvl').textContent='Nível '+lv;
+  document.getElementById('lvl-n').textContent=LEVELS[Math.min(Math.floor((lv-1)/4),LEVELS.length-1)]+' · '+(total%7)+'/7';
+}
+const tabs=[...document.querySelectorAll('.tabbar a')];
+const io='IntersectionObserver' in window?new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting)tabs.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))});
+},{rootMargin:'-30% 0px -60% 0px'}):null;
+if(io)['hoje','progresso','ajustes'].forEach(id=>io.observe(document.getElementById(id)));
 const _render=render;
-render=function(){_render();renderReminder();inAppNudge()};
+render=function(){_render();renderReminder();inAppNudge();renderLevel()};
 
 load();
 render();
