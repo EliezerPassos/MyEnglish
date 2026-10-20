@@ -118,3 +118,13 @@ h1{background:var(--grad);-webkit-background-clip:text;background-clip:text;colo
 .tabbar a.on{color:#fff;background:var(--accent-soft)}
 html{scroll-behavior:smooth}
 section[id]{scroll-margin-top:12px}
+
+/* Cronômetro e temas de fala */
+.timer{margin-top:8px;width:100%;background:var(--accent-soft);color:var(--ink);border:1px solid rgba(139,92,246,.5);border-radius:10px;padding:10px;font-weight:700;font-variant-numeric:tabular-nums}
+.timer:active{transform:scale(.99)}
+.prompts{margin-top:8px;border:1px solid rgba(59,130,246,.4);background:var(--sun-soft);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.prompts .ph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.prompts .swap{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:4px 10px;font-size:.85rem}
+.prompts ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
+.prompts .en{display:block;font-weight:700}
+.prompts .pt{display:block;font-size:.85rem;color:var(--muted)}

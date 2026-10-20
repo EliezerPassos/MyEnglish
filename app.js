@@ -19,6 +19,19 @@ const MILES=[
 ];
 const TOTAL_DAYS=168;
 
+const PROMPTS=[
+ [['What is your name and where are you from?','Qual é o seu nome e de onde você é?'],['What do you do every morning?','O que você faz toda manhã?'],['Describe your house or your room.','Descreva sua casa ou seu quarto.'],['What did you eat today?','O que você comeu hoje?'],['Who is in your family?','Quem faz parte da sua família?'],['What is your favorite food and why?','Qual é sua comida favorita e por quê?'],['What time do you wake up and go to bed?','A que horas você acorda e dorme?'],['What is the weather like today?','Como está o tempo hoje?'],['What do you like to do on weekends?','O que você gosta de fazer nos fins de semana?'],['Describe your best friend.','Descreva seu melhor amigo.'],['What are you wearing right now?','O que você está vestindo agora?'],['Tell me about your job or your studies.','Fale do seu trabalho ou dos seus estudos.']],
+ [['What did you do yesterday?','O que você fez ontem?'],['What are your plans for this week?','Quais são seus planos para esta semana?'],['Tell me about your last vacation or trip.','Conte da sua última viagem.'],['Why are you learning English?','Por que você está aprendendo inglês?'],['Describe your daily routine at work or school.','Descreva sua rotina no trabalho ou na escola.'],['What is your favorite movie or series? Tell me the story.','Qual seu filme ou série favorita? Conte a história.'],['What problem did you have recently and how did you solve it?','Que problema você teve e como resolveu?'],['Where would you like to live and why?','Onde você gostaria de morar e por quê?'],['Tell me about a person you admire.','Fale de uma pessoa que você admira.'],['What do you usually do when you are tired or stressed?','O que você faz quando está cansado ou estressado?'],['Explain how to make your favorite dish.','Explique como fazer seu prato favorito.'],['What are you going to do next weekend?','O que você vai fazer no próximo fim de semana?']],
+ [['What is your opinion about social media? Give two reasons.','Qual sua opinião sobre redes sociais? Dê dois motivos.'],['Tell a story about something funny or surprising that happened to you.','Conte algo engraçado ou surpreendente que aconteceu com você.'],['If you could change one thing in your city, what would it be?','Se pudesse mudar uma coisa na sua cidade, qual seria?'],['Where do you see yourself in five years?','Onde você se vê em cinco anos?'],['Compare life today with life 20 years ago.','Compare a vida hoje com a de 20 anos atrás.'],['What would you do if you won the lottery?','O que você faria se ganhasse na loteria?'],['Explain your job or your hobby to someone who knows nothing about it.','Explique seu trabalho ou hobby para quem não conhece.'],['What is the best advice you ever received?','Qual o melhor conselho que você já recebeu?'],['Summarize the last video or episode you watched, without subtitles.','Resuma o último vídeo ou episódio que você viu.'],['Do you agree that learning a language is hard? Why or why not?','Você concorda que aprender idioma é difícil? Por quê?'],['Pretend you are in a job interview: tell me about yourself.','Finja uma entrevista de emprego: fale sobre você.'],['What skill would you like to learn and how would you start?','Que habilidade você quer aprender e como começaria?']]
+];
+function todayPrompts(){
+  const n=Math.floor(parse(viewKey).getTime()/864e5);
+  const list=PROMPTS[state.phase-1];
+  const shift=(state.promptShift&&state.promptShift[viewKey])||0;
+  return [0,1,2].map(i=>list[(n*3+i+shift*3)%list.length]);
+}
+
+
 const pad=n=>String(n).padStart(2,'0');
 const key=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
@@ -52,6 +65,34 @@ function streak(){
 function fmtDate(k){
   return parse(k).toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
 }
+
+
+// Cronômetro: um por vez, só para o dia de hoje
+let timer=null,tick=null;
+function fmt(s){return pad(Math.floor(s/60))+':'+pad(s%60)}
+function timerLabel(b,mins){
+  if(timer&&timer.k===b.k){const s=Math.max(0,Math.ceil((timer.end-Date.now())/1000));return '⏸ '+fmt(s)+' · parar'}
+  return '▶ Iniciar '+fmt(mins*60)
+}
+function startTimer(b,mins){
+  if(timer&&timer.k===b.k){stopTimer();render();return}
+  stopTimer();
+  timer={k:b.k,end:Date.now()+mins*60000,mins};
+  tick=setInterval(()=>{
+    const left=Math.ceil((timer.end-Date.now())/1000);
+    const el=document.getElementById('tm-'+timer.k);
+    if(left<=0){
+      const k=timer.k;stopTimer();
+      try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch(e){}
+      if(!(state.days[todayKey()]||{})[k]){viewKey=todayKey();toggle(k,true)}else render();
+      note('Tempo acabou. Etapa marcada como feita!');
+      return;
+    }
+    if(el) el.textContent='⏸ '+fmt(left)+' · parar';
+  },500);
+  render();
+}
+function stopTimer(){clearInterval(tick);tick=null;timer=null}
 
 let render=function(){
   const tk=todayKey();
@@ -91,7 +132,33 @@ let render=function(){
     if(b.href){const a=document.createElement('a');a.href=b.href;a.target='_blank';a.rel='noopener';a.textContent=b.hl+' ↗';a.addEventListener('click',e=>e.stopPropagation());ds.append(a)}
     txt.append(t,ds);
     const m=document.createElement('span');m.className='min';m.textContent=opt?'opcional':(sh?b.min[1]:b.min[0])+' min';
-    lab.append(inp,box,txt,m);li.append(lab);ul.append(li);
+    lab.append(inp,box,txt,m);li.append(lab);
+    const mins=opt?0:(sh?b.min[1]:b.min[0]);
+    if(b.k==='b4'){
+      const box2=document.createElement('div');box2.className='prompts';
+      const hd=document.createElement('div');hd.className='ph';
+      const hs=document.createElement('b');hs.textContent='Fale sobre isto hoje';
+      const sw=document.createElement('button');sw.className='swap';sw.type='button';sw.textContent='Trocar';
+      sw.addEventListener('click',()=>{state.promptShift=state.promptShift||{};state.promptShift[viewKey]=(state.promptShift[viewKey]||0)+1;changed()});
+      hd.append(hs,sw);box2.append(hd);
+      const ol=document.createElement('ol');
+      todayPrompts().forEach(p=>{
+        const q=document.createElement('li');
+        const en=document.createElement('span');en.className='en';en.textContent=p[0];
+        const pt=document.createElement('span');pt.className='pt';pt.textContent=p[1];
+        q.append(en,pt);ol.append(q);
+      });
+      box2.append(ol);
+      const tip=document.createElement('div');tip.className='note';tip.textContent='Responda em voz alta, grave um áudio e, se travar, anote a palavra que faltou.';
+      box2.append(tip);li.append(box2);
+    }
+    if(mins>0&&viewKey===todayKey()&&!d[b.k]){
+      const tb=document.createElement('button');tb.type='button';tb.className='timer';tb.id='tm-'+b.k;
+      tb.textContent=timerLabel(b,mins);
+      tb.addEventListener('click',()=>startTimer(b,mins));
+      li.append(tb);
+    }
+    ul.append(li);
   });
   document.getElementById('banner').hidden=status(viewKey)!=='c';
 
